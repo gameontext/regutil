@@ -73,10 +73,9 @@ public class RegistrationUtilityTest {
         assertThat(log.getLog(), containsString("DELETE"));
     }
 
-    // currently does not return an error code via command line use, perhaps should like other calls.
     @Test
     public void test_DELETE_without_room_id_throws_exception() {
-        //exit.expectSystemExitWithStatus(500);
+        exit.expectSystemExitWithStatus(1);
         RegistrationUtility.main(new String[] {"-i=123", "-s=dingdong","-m=DELETE","reg.json"} );
         assertThat(log.getLog(), containsString("you need to supply the room id"));
     }
