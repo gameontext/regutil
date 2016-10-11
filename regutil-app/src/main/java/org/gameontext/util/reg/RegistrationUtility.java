@@ -55,7 +55,7 @@ public class RegistrationUtility {
 
 
     @FunctionalInterface
-    public interface CheckedSupplier<T,R> {
+    public interface CheckedSupplier<R> {
         R get() throws Exception;
     }
 
@@ -64,7 +64,7 @@ public class RegistrationUtility {
             RegistrationUtility util = new RegistrationUtility();
             util.parseArgs(args, util);
 
-            Map<String,CheckedSupplier <String,Integer> > actions = new HashMap<>();
+            Map<String,CheckedSupplier <Integer> > actions = new HashMap<>();
             actions.put(HTTP_METHOD.POST.name(), () -> {return util.getJSONResponse(util.sendToServer(util.getUrl()));});
             actions.put(HTTP_METHOD.PUT.name(), () -> {return util.getJSONResponse(util.sendToServer(util.getUrl() + "/" + util.getRoomid()));});
             actions.put(HTTP_METHOD.DELETE.name(), () -> {return util.getJSONResponse(util.sendToServer(util.getUrl() + "/" + util.getRoomid()));});
@@ -76,13 +76,9 @@ public class RegistrationUtility {
             System.out.println("System exit code : " + exitCode);
             System.exit(exitCode);
         } catch (Exception e) {
-            // Don't redisplay help text if JUnit test harness
-            // is preventing system exits from occuring.
-            // see: http://stefanbirkner.github.io/system-rules/#ExpectedSystemExit
-            if (!e.getMessage().equals("Tried to exit with status 1.")) {
-                System.out.println("Error : " + e.getMessage());
-                printHelp();
-            }
+            System.out.println(e.getMessage());
+            printHelp();
+            System.exit(1);
         }
     }
 
@@ -90,8 +86,7 @@ public class RegistrationUtility {
 
         util.setUrl(cmdargs.containsKey(MAP_SVC) ? cmdargs.get(MAP_SVC) : "https://game-on.org/map/v1/sites");
         if(args.length == 0) {
-            printHelp();
-            System.exit(1);
+            throw new IllegalArgumentException("");
         }
         for(int i = 0; i < args.length - 1; i++) {
             int pos = args[i].indexOf('=');     //split this way as value may contain = at the end e.g. for B64 encoded string
